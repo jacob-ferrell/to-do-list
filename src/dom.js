@@ -1,4 +1,5 @@
 import Item from './item';
+import projects from './index';
 
 const DOMManipulation = (() => {
 
@@ -30,6 +31,8 @@ const DOMManipulation = (() => {
         let description = document.createElement('div');
         description.textContent = project.description;
 
+        let dropDown = createDropDown(project);
+
         let addItemBtn = document.createElement('button');
         addItemBtn.textContent = 'Add To-Do';
 
@@ -40,9 +43,95 @@ const DOMManipulation = (() => {
         
         container.appendChild(name);
         container.appendChild(description);
+        container.appendChild(dropDown);
+        if (project.items.length) {
+            container.appendChild(createItemElements(project.items));
+        }
         container.appendChild(addItemBtn);
         container.appendChild(removeBtn);
         
+    }
+
+    function createDropDown(project) {
+        const container = document.createElement('div');
+        container.classList.add('dropdown');
+
+        const btn = document.createElement('button');
+        btn.textContent = 'Mark As';
+        btn.classList.add('dropbtn');
+        btn.addEventListener('click', ()=> document.querySelector('.dropdown-content').style.display = 'flex');
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropbtn')) document.querySelector('.dropdown-content').style.display = 'none';
+        }
+        container.appendChild(btn);
+
+        const content = document.createElement('div');
+        content.classList.add('dropdown-content');
+        container.appendChild(content);
+
+        const itemText = ['Complete', 'Incomplete'];
+        itemText.forEach((text, i) => {
+            let item = document.createElement('a');
+            item.id = text.toLowerCase();
+            item.addEventListener('click', (e) => {
+                console.log(e.target.id)
+                getCheckedItems().forEach(check => project.items.forEach(item => {
+                    let checkedTitle = check.id.replace('todo-', '');
+                    if (item.title == checkedTitle) {
+                        if (e.target.id == 'complete') {
+                        item.complete = true;
+                        check.classList.add('complete');
+                        console.log(item);
+                        } else {
+                            item.complete = false;
+                            check.classList.remove('complete');
+                            console.log(item)
+                        }
+
+                    }
+                }))
+                
+            })
+            item.textContent = text;
+            content.appendChild(item);
+        })
+        return container;
+    }
+
+    function getCheckedItems() {
+        let checked = [];
+        const boxes = document.querySelectorAll('.todo-item input');
+        boxes.forEach(box => {
+            if (box.checked) checked.push(box.parentNode);
+            box.checked = false;
+        })
+        return checked;
+    }
+    //create a list of todo items for each project in the DOM
+    function createItemElements(items) {
+        const container = document.createElement('div');
+        container.classList.add('items-container');
+        items.forEach((item, i) => {
+            let itemElement = document.createElement('div');
+            itemElement.classList.add('todo-item');
+            if (item['complete']) itemElement.classList.add('complete');
+            itemElement.id = `todo-${item['title'].toLowerCase().replace(' ', '-')}`
+
+            let checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+
+            itemElement.appendChild(checkbox);
+            let keys = ['title', 'dueDate', 'priority'];
+            
+            keys.forEach(key => {
+                let field = document.createElement('div');
+                field.textContent = item[key];
+
+                itemElement.appendChild(field)
+            })
+            container.appendChild(itemElement);
+        })
+        return container;
     }
 
     function addProjectButtonClickEvents(addItem, removeProject, project) {
@@ -57,18 +146,17 @@ const DOMManipulation = (() => {
                 radios.forEach(radio => {
                     if (radio.checked) {
                         project.addItem(Item(title, description, dueDate, radio.value))
-                        console.log(project.items)
                     }
                 })
-
                 document.getElementById('form').remove();
+                displayProject(project);
 
             })
         })
 
         removeProject.addEventListener('click', ()=> {
             document.getElementById(`sidebar-${project.name}`).remove();
-            removeAllChildren(container);
+            removeAllChildren(document.querySelector('.project-display'));
         });
     }
 

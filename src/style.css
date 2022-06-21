@@ -13,3 +13,31 @@ body {
     flex-direction: column;
     background-color: rgb(238, 238, 238);
 }
+.todo-item {
+    display: flex;
+    gap: 15px;
+    background-color: rgb(238, 238, 238);
+}
+.complete {
+    background-color: aquamarine;
+}
+.projects-heading {
+    font-weight: bold;
+}
+.projects-container > div {
+    margin-left: 10px;
+}
+.dropdown {
+    align-self: end;
+    position: relative;
+    display: inline-block;
+}
+.dropdown-content {
+    display: none;
+    position: absolute;
+    flex-direction: column;
+    background: white;
+}
+.dropdown-content a {
+    display: block;
+}
