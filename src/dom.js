@@ -1,3 +1,5 @@
+import Item from './item';
+
 const DOMManipulation = (() => {
 
     const body = document.querySelector('body');
@@ -7,7 +9,73 @@ const DOMManipulation = (() => {
     }
     //generate element to display information for a given project
     function createProject(project) {
+        const container = document.createElement('div');
+    }
+    //add name of project to list in sidebar. also add event listener so that when clicked, the projects information is displayed
+    function addProjectToSidebar(project) {
+        const container = document.querySelector('.projects-container');
+        let toAdd = document.createElement('div');
+        toAdd.textContent = project.name;
+        toAdd.id = `sidebar-${project.name.toLowerCase()}`;
+        toAdd.addEventListener('click', ()=> displayProject(project));
+        container.appendChild(toAdd);
+    }
 
+    function displayProject(project) {
+        const container = document.querySelector('.project-display');
+        removeAllChildren(container);
+        let name = document.createElement('div')
+        name.textContent = project.name;
+
+        let description = document.createElement('div');
+        description.textContent = project.description;
+
+        let addItemBtn = document.createElement('button');
+        addItemBtn.textContent = 'Add To-Do';
+
+        let removeBtn = document.createElement('button');
+        removeBtn.textContent = 'Remove Project';
+
+        addProjectButtonClickEvents(addItemBtn, removeBtn, project);
+        
+        container.appendChild(name);
+        container.appendChild(description);
+        container.appendChild(addItemBtn);
+        container.appendChild(removeBtn);
+        
+    }
+
+    function addProjectButtonClickEvents(addItem, removeProject, project) {
+        addItem.addEventListener('click', () => {
+            createForm('item');
+            let submit = document.getElementById('submit');
+            submit.addEventListener('click', () => {
+                let title = document.querySelector('.title input').value;
+                let description = document.querySelector('.description input').value;
+                let dueDate = document.querySelector('.due-date input').value;
+                let radios = document.getElementsByName('priority');
+                radios.forEach(radio => {
+                    if (radio.checked) {
+                        project.addItem(Item(title, description, dueDate, radio.value))
+                        console.log(project.items)
+                    }
+                })
+
+                document.getElementById('form').remove();
+
+            })
+        })
+
+        removeProject.addEventListener('click', ()=> {
+            document.getElementById(`sidebar-${project.name}`).remove();
+            removeAllChildren(container);
+        });
+    }
+
+    function removeAllChildren(parent) {
+        while (parent.firstChild) {
+            parent.removeChild(parent.firstChild);
+        }
     }
     //create a form for input. accepts type as argument, which can be 'project' or 'item'
     function createForm(type) {
@@ -65,7 +133,7 @@ const DOMManipulation = (() => {
         })
         return container;
     }
-    return {createForm};
+    return {createForm, addProjectToSidebar};
 })();
 
 export default DOMManipulation;

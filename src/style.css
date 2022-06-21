@@ -1,0 +1,15 @@
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0px;
+}
+body {
+    display: flex;
+}
+.sidebar {
+    width: 200px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(238, 238, 238);
+}

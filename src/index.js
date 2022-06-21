@@ -9,10 +9,15 @@ newProjectButton.addEventListener('click', ()=> {
     DOM.createForm('project');
     let submit = document.getElementById('submit');
     submit.addEventListener('click', ()=> {
-        let name = document.querySelector('.name input').value;
-        let description = document.querySelector('.description input').value;
-        projects.push(Project(name, description));
-        document.getElementById('form').remove();
-        console.log(projects)
+        addProject();
     })
 })
+
+const addProject = () => {
+    let name = document.querySelector('.name input').value;
+    let description = document.querySelector('.description input').value;
+    let newProject = Project(name, description);
+    projects.push(newProject);
+    DOM.addProjectToSidebar(newProject);
+    document.getElementById('form').remove();
+}

@@ -4,7 +4,7 @@ const Project = (name, description) => {
 
     const addItem = (item) => items.push(item);
 
-    return {name, description};
+    return {name, description, addItem, items};
 }
 
 export default Project;
