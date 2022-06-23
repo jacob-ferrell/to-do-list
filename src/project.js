@@ -1,5 +1,5 @@
 //factory function for creating objects for projects
-const Project = (name, projects) => {
+const Project = (name, projects, isInbox = false) => {
     const items = [];
 
     const addItem = (item) => items.push(item);
@@ -14,9 +14,14 @@ const Project = (name, projects) => {
         }
     }
 
-    const id = getUniqueId();
+    const removeItem = (itemId) => {
+        let byId = items.map(e => e.id);
+        items.splice(byId.indexOf(itemId), 1);
+    }
 
-    return {name, addItem, items, id};
+    const id = isInbox ? '9999' : getUniqueId();
+
+    return {name, addItem, items, id, removeItem};
 }
 
 export default Project;

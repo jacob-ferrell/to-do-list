@@ -44,6 +44,7 @@ const DOMManipulation = (() => {
 
         heading.appendChild(name);
         heading.appendChild(removeBtn);
+        if (container.id == '9999') removeBtn.style.display = 'none';
         container.appendChild(heading);
         container.appendChild(addItemBtn);
         container.appendChild(taskContainer);
@@ -120,18 +121,90 @@ const DOMManipulation = (() => {
             let checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
 
+            let edit = document.createElement('button');
+            edit.textContent = 'Edit';
+            edit.classList.add('edit');
+            edit.id = `edit-${item.id}`;
+            edit.addEventListener('click', (e) => {
+                let taskId = document.getElementById(e.target.id).parentNode.id;
+                setEditTaskFields(taskId);
+                setEditTaskEvents(taskId);
+            })
+
+            let deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.classList.add('delete');
+            deleteBtn.id = `delete-${item.id}`
+            deleteBtn.addEventListener('click', (event)=> {
+                console.log(event.target.id)
+                let parent = document.getElementById(event.target.id).parentNode;
+                parent.remove();
+                project.removeItem(parent.id);
+            })
+
             itemElement.appendChild(checkbox);
             let keys = ['title', 'dueDate', 'priority'];
             
             keys.forEach(key => {
                 let field = document.createElement('div');
-                field.textContent = item[key];
-
+                field.textContent = key == 'dueDate' ? formatDate(item[key]) : item[key];
                 itemElement.appendChild(field)
             })
+
+            itemElement.appendChild(edit);
+            itemElement.appendChild(deleteBtn);
             container.appendChild(itemElement);
         })
         return container;
+    }
+
+    function setEditTaskFields(taskId) {
+        const popup = document.querySelector('.edit-task-popup');
+        popup.style.display = 'flex';
+        const task = selectDisplayedProject().items.filter(task => task.id == taskId)[0];
+
+        let title = document.querySelector('#edit-task-form #title');
+        let description = document.querySelector('#edit-task-form .description');
+        let dueDate = document.querySelector('#edit-task-form #due-date');
+
+        title.value = task.title;
+        description.value = task.description;
+        dueDate.value = task.dueDate;
+        document.querySelectorAll('#edit-task-form .priority-container input').forEach(radio => {
+            if (task.priority == radio.value) radio.checked = true;
+        });
+    }
+
+    function setEditTaskEvents(taskId) {
+        const project = selectDisplayedProject()
+        const byId = project.items.map(e => e.id);
+        const task = selectDisplayedProject().items.filter(task => task.id == taskId)[0];
+        const form = document.getElementById('edit-task-form')
+        const newForm = form.cloneNode(true);  
+        const closeForm = () => document.querySelector('.edit-task-popup').style.display = 'none';
+        form.parentNode.replaceChild(newForm, form);
+        newForm.addEventListener('submit', ()=> {
+            let title = document.querySelector('#edit-task-form #title').value;
+            let description = document.querySelector('#edit-task-form .description').value;
+            let dueDate = document.querySelector('#edit-task-form #due-date').value;
+            document.querySelectorAll('#edit-task-form .priority-container input').forEach(radio => {
+                if (radio.checked) project.items[byId.indexOf(taskId)] = Item(title, description, dueDate, radio.value, selectDisplayedProject());
+            });
+            displayProject(selectDisplayedProject());
+            closeForm();
+        })
+
+        const close = document.querySelector('.close-edit');
+        close.addEventListener('click', ()=> closeForm());
+        
+    }
+
+    function formatDate(date) {
+        date = new Date(date.replace(/-/g, '\/'));
+        return date.toLocaleDateString([], {
+            month: 'short',
+            day: 'numeric',
+        })
     }
 
 
@@ -158,10 +231,12 @@ const DOMManipulation = (() => {
             let title = document.getElementById('title').value;
             let description = document.querySelector('.description').value;
             let dueDate = document.getElementById('due-date').value;
-            let priority = document.querySelector('.priority-container').value;
-            if (title) project.addItem(Item(title, description, dueDate, priority, project));
+            document.querySelectorAll('.priority-container input').forEach(radio => {
+                if (radio.checked && title && dueDate) {
+                    project.addItem(Item(title, description, dueDate, radio.value, project));
+                }
+            });
             console.log(project);
-            console.log('projects', Main.projects);
             taskFormContainer.style.display = 'none';
             displayProject(project);
             taskForm.reset();
@@ -174,7 +249,8 @@ const DOMManipulation = (() => {
     function selectDisplayedProject() {
         const byId = Main.projects.map(e => e.id);
         let currentId = document.querySelector('.project-display').id;
-        return Main.projects[byId.indexOf(currentId)];
+        let project = Main.projects[byId.indexOf(currentId)];
+        return project ? project : Main.inbox;
     }
     function removeAllChildren(parent) {
         while (parent.firstChild) {

@@ -9,7 +9,9 @@
 </head>
 <body>
     <div class="sidebar">
-        
+        <div class="inbox">Inbox</div>
+        <div class="today">Today</div>
+        <div class="week">This Week</div>
         <div class="projects-heading">Projects</div>
         
         <div class="projects-container"></div>
@@ -38,6 +40,25 @@
                     <input type="radio" id="low-button" name="priority" value="low" required><label for="low-button" class="priority-button">Low</label><input type="radio" id="medium-button" name="priority" value="medium" required><label for="medium-button" class="priority-button">Medium</label><input type="radio" id="high-button" name="priority" value="high" required><label for="high-button" class="priority-button">High</label>
                 </div>
                 <input type="submit" value="Add" id="submit-form">
+            </div>
+        </form>
+    </div>
+    <div class="edit-task-popup">
+        <button class="close-edit"><svg style="width:12px;height:12px" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
+        </svg></button>
+        <form id="edit-task-form" onsubmit="return false;">
+            <input type="text" placeholder="Title" id="title" required>
+            <textarea class="description" placeholder="Description:"></textarea>
+            <div class="due-date-container">
+                <div>Due Date:</div>
+                <input type="date" id="due-date" required>
+            </div>
+            <div class="task-button-container">
+                <div class="priority-container">
+                    <input type="radio" id="low-button" name="priority" value="low" required><label for="low-button" class="priority-button">Low</label><input type="radio" id="medium-button" name="priority" value="medium" required><label for="medium-button" class="priority-button">Medium</label><input type="radio" id="high-button" name="priority" value="high" required><label for="high-button" class="priority-button">High</label>
+                </div>
+                <input type="submit" value="Submit Edit" id="submit-edit">
             </div>
         </form>
     </div>

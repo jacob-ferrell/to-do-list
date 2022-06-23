@@ -1,5 +1,5 @@
 //factory function for creating objects for todo items
-const TodoItem = (title, description, dueDate, priority, project) => {
+const Task = (title, description, dueDate, priority, project) => {
     let complete = false;
 
     const getUniqueId = () => {
@@ -18,4 +18,4 @@ const TodoItem = (title, description, dueDate, priority, project) => {
     return {title, description, dueDate, priority, complete, id};
 }
 
-export default TodoItem;
+export default Task;

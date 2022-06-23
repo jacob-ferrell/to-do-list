@@ -3,11 +3,14 @@ import Item from './item';
 import DOM from './dom';
 import Project from './project.js';
 
-function preventReload(event) {
-    return false;
-}
+
 const Main = (() => {
     const projects = [];
+    const inbox = Project('Inbox', [], true);
+    DOM.displayProject(inbox);
+    document.querySelector('.inbox').addEventListener('click', ()=> {
+        DOM.displayProject(inbox);
+    })
     const newProjectButton = document.querySelector('.new-project');
     newProjectButton.addEventListener('click', ()=> {
         DOM.createProjectNameForm();
@@ -40,6 +43,6 @@ const Main = (() => {
         document.querySelector('.projects-heading').textContent = `Projects (${projects.length})`;
     }
 
-    return {removeProject, projects};
+    return {removeProject, projects, inbox};
 })();
 export default Main;

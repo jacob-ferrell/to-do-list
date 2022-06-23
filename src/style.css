@@ -21,6 +21,10 @@ body {
 .complete {
     background-color: aquamarine;
 }
+.inbox, .today, .week {
+    font-weight: bold;
+    font-size: 22px;
+}
 .projects-heading {
     font-weight: bold;
     font-size: 22px;
@@ -71,7 +75,7 @@ body {
 #add-item {
     position: absolute;
 }
-.new-task-popup {
+.new-task-popup, .edit-task-popup {
     display: none;
     border: 1px solid black;
     padding: 7px;
@@ -81,7 +85,7 @@ body {
     flex-direction: column;
     gap: 15px;
 }
-#new-task-form {
+#new-task-form, #edit-task-form {
     display: flex;
     flex-direction: column;
 }
@@ -105,7 +109,7 @@ body {
     display: flex;
     gap: 10px;
 }
-.close {
+.close, .close-edit {
     position: absolute;
     height: fit-content;
     width: fit-content;
