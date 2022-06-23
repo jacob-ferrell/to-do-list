@@ -7,7 +7,7 @@ body {
     display: flex;
 }
 .sidebar {
-    width: 200px;
+    width: 300px;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -23,9 +23,14 @@ body {
 }
 .projects-heading {
     font-weight: bold;
+    font-size: 22px;
+    margin-bottom: 5px;
 }
 .projects-container > div {
-    margin-left: 10px;
+    padding-left: 10px;
+}
+.projects-container > div:hover {
+    background-color: grey;
 }
 .dropdown {
     align-self: end;
@@ -40,4 +45,83 @@ body {
 }
 .dropdown-content a {
     display: block;
+}
+.new-container {
+    margin-top: 15px;
+    width: 100%;
+    
+}
+.new-project {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    width: 100%;
+    border: none;
+    padding-left: 15px;
+}
+.new-project:hover {
+    background-color: rgb(204, 204, 204);
+}
+#project-name-display {
+    font-size: 18px;
+    font-weight: bold;
+}
+.items-container {
+}
+#add-item {
+    position: absolute;
+}
+.new-task-popup {
+    display: none;
+    border: 1px solid black;
+    padding: 7px;
+    position: absolute;
+    left: 30%;
+    top: 15%;
+    flex-direction: column;
+    gap: 15px;
+}
+#new-task-form {
+    display: flex;
+    flex-direction: column;
+}
+.description {
+    height: 60px; 
+    width: 300px;
+}
+.due-date-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+#due-date {
+
+}
+.task-button-container {
+    display: flex;
+    justify-content: space-between;
+}
+.priority-container {
+    display: flex;
+    gap: 10px;
+}
+.close {
+    position: absolute;
+    height: fit-content;
+    width: fit-content;
+    top: 0;
+    right: 0;
+}
+.project-display {
+    display: none;
+    padding: 20px;
+    width: 100%;
+    flex-direction: column;
+}
+.project-display-heading {
+    display: flex;
+    justify-content: space-between;
+}
+#add-item-button {
+    width: fit-content;
 }
