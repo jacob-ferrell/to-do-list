@@ -18,9 +18,17 @@ const DOMManipulation = (() => {
 
     function displayProject(project) {
         const container = document.querySelector('.project-display');
+        container.id = project.id;
+        const heading = document.createElement('div');
+        heading.classList.add('project-display-heading');
+        container.style.display = 'flex';
         removeAllChildren(container);
         let name = document.createElement('div')
         name.textContent = project.name;
+        name.id = 'project-name-display';
+
+        let taskContainer = document.createElement('div');
+        taskContainer.classList.add('task-container');
 
         let description = document.createElement('div');
         description.textContent = project.description;
@@ -28,21 +36,23 @@ const DOMManipulation = (() => {
         let dropDown = createDropDown(project);
 
         let addItemBtn = document.createElement('button');
-        addItemBtn.textContent = 'Add To-Do';
+        addItemBtn.textContent = '+ Task';
+        addItemBtn.id = 'add-item-button';
 
         let removeBtn = document.createElement('button');
         removeBtn.textContent = 'Remove Project';
 
-        addProjectButtonClickEvents(addItemBtn, removeBtn, project);
-        
-        container.appendChild(name);
+        heading.appendChild(name);
+        heading.appendChild(removeBtn);
+        container.appendChild(heading);
+        container.appendChild(addItemBtn);
+        container.appendChild(taskContainer);
+         addProjectButtonClickEvents(addItemBtn, removeBtn, project);
         container.appendChild(description);
         container.appendChild(dropDown);
         if (project.items.length) {
             container.appendChild(createItemElements(project));
         }
-        container.appendChild(addItemBtn);
-        container.appendChild(removeBtn);
         
     }
 
@@ -127,94 +137,81 @@ const DOMManipulation = (() => {
 
 
     function addProjectButtonClickEvents(addItem, removeProject, project) {
+        const taskFormContainer = document.querySelector('.new-task-popup');
+        const taskForm = document.getElementById('new-task-form');
+        taskForm.addEventListener('submit', submitForm);
         addItem.addEventListener('click', () => {
-            createForm('item');
-            let submit = document.getElementById('submit');
-            submit.addEventListener('click', () => {
-                let title = document.querySelector('.title input').value;
-                let description = document.querySelector('.description input').value;
-                let dueDate = document.querySelector('.due-date input').value;
-                let radios = document.getElementsByName('priority');
-                radios.forEach(radio => {
-                    if (radio.checked) {
-                        project.addItem(Item(title, description, dueDate, radio.value, project))
-                    }
-                })
-                document.getElementById('form').remove();
-                displayProject(project);
-
-            })
+            taskFormContainer.style.display = 'flex';            
         })
-
+        let cancel = document.querySelector('.close');
+        cancel.addEventListener('click', () => {
+            taskFormContainer.style.display = 'none';
+            taskForm.reset();
+        })
         removeProject.addEventListener('click', ()=> {
             document.getElementById(`sidebar-${project.id}`).remove();
             Main.removeProject(project);
             removeAllChildren(document.querySelector('.project-display'));
         });
+        function submitForm(e) {
+            project = selectDisplayedProject();
+            let title = document.getElementById('title').value;
+            let description = document.querySelector('.description').value;
+            let dueDate = document.getElementById('due-date').value;
+            let priority = document.querySelector('.priority-container').value;
+            if (title) project.addItem(Item(title, description, dueDate, priority, project));
+            console.log(project);
+            console.log('projects', Main.projects);
+            taskFormContainer.style.display = 'none';
+            displayProject(project);
+            taskForm.reset();
+            taskForm.removeEventListener('submit', submitForm);
+        }
     }
 
+    
+
+    function selectDisplayedProject() {
+        const byId = Main.projects.map(e => e.id);
+        let currentId = document.querySelector('.project-display').id;
+        return Main.projects[byId.indexOf(currentId)];
+    }
     function removeAllChildren(parent) {
         while (parent.firstChild) {
             parent.removeChild(parent.firstChild);
         }
     }
     //create a form for input. accepts type as argument, which can be 'project' or 'item'
-    function createForm(type) {
-        let fields = type == 'project' ? ['Name', 'Description'] : ['Title', 'Description', 'Due Date', 'Priority'];
-        let form = createInputFields(fields);
-        form.id = 'form';
+    function createProjectNameForm() {
+        document.querySelector('.new-project').style.display = 'none';
+
+        let container = document.createElement('div');
+        container.id = 'add-project';
+
+        let input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Name';
+        container.appendChild(input);
+
+        let buttonContainer = document.createElement('div');
+
         let submitButton = document.createElement('button');
         submitButton.textContent = 'Submit';
         submitButton.id = 'submit';
-        form.appendChild(submitButton);
-        type == 'project' ? sidebar.appendChild(form) : body.appendChild(form);
+        buttonContainer.appendChild(submitButton);
+
+        let cancelButton = document.createElement('button');
+        cancelButton.textContent = 'Cancel';
+        cancelButton.id = 'cancel';
+        buttonContainer.appendChild(cancelButton);
+
+        container.appendChild(buttonContainer);
+        sidebar.appendChild(container);
     }
-    //creates radio buttons and labels for radio buttons for priority
-    function createPriorityRadios() {
-        const levels = ['Low', 'Medium', 'High'];
-        let container = document.createElement('div');
-        container.classList.add('priority-container');
-        const containerLabel = document.createElement('label');
-        containerLabel.textContent = 'Priority:  ';
-        container.appendChild(containerLabel);
-        levels.forEach(level => {
-            let radio = document.createElement('input');
-            let label = document.createElement('label');
-            label.for = level.toLowerCase();
-            label.textContent = level;
-            radio.type = 'radio';
-            radio.name = 'priority';
-            radio.value = level;
-            radio.id = level.toLowerCase();
-            container.appendChild(radio);
-            container.appendChild(label);
-        })
-        return container;
-    }
-    //create input elements appropriately for different fields
-    function createInputFields(fieldNames) {
-        let container = document.createElement('div');
-        fieldNames.forEach(field => {
-            let fieldContainer = document.createElement('div');
-            fieldContainer.classList.add(field.toLowerCase().replace(' ', '-'));
-            if (field == 'Priority') {
-                container.appendChild(createPriorityRadios());
-            } else {
-                let input = document.createElement('input');
-                if (field == 'Due Date') {
-                    input.type = 'date';
-                    let label = document.createElement('label');
-                    label.textContent = 'Due Date:  ';
-                    fieldContainer.appendChild(label);
-                }
-                input.placeholder = field;
-                fieldContainer.appendChild(input);
-                container.appendChild(fieldContainer)
-            }
-        })
-        return container;
-    }
-    return {createForm, addProjectToSidebar};
+
+
+
+    return {createProjectNameForm, addProjectToSidebar, displayProject};
 })();
 
 export default DOMManipulation;
