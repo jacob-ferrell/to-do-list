@@ -228,10 +228,10 @@ const DOMManipulation = (() => {
         });
         function submitForm(e) {
             project = selectDisplayedProject();
-            let title = document.getElementById('title').value;
-            let description = document.querySelector('.description').value;
-            let dueDate = document.getElementById('due-date').value;
-            document.querySelectorAll('.priority-container input').forEach(radio => {
+            let title = document.querySelector('.new-task-popup #title').value;
+            let description = document.querySelector('.new-task-popup .description').value;
+            let dueDate = document.querySelector('.new-task-popup #due-date').value;
+            document.querySelectorAll('.new-task-popup .priority-container input').forEach(radio => {
                 if (radio.checked && title && dueDate) {
                     project.addItem(Item(title, description, dueDate, radio.value, project));
                 }
