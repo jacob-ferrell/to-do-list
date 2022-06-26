@@ -1,5 +1,5 @@
 //factory function for creating objects for projects
-const Project = (name, projects, isInbox = false) => {
+const Project = (name, projects, isInbox = false, isToday = false, isWeek = false) => {
     const items = [];
 
     const addItem = (item) => items.push(item);
@@ -19,7 +19,7 @@ const Project = (name, projects, isInbox = false) => {
         items.splice(byId.indexOf(itemId), 1);
     }
 
-    const id = isInbox ? '9999' : getUniqueId();
+    const id = isInbox ? '9999' : isToday ? '9998' : isWeek ? '9997' : getUniqueId();
 
     return {name, addItem, items, id, removeItem};
 }

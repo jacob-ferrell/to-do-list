@@ -16,6 +16,15 @@ const DOMManipulation = (() => {
         container.appendChild(toAdd);
     }
 
+    function displayToday(todayElements) {
+        const container = document.querySelector('.project-display');
+        removeAllChildren(container);
+        container.appendChild(createItemElements(todayElements));
+        container.style.display = 'flex';
+
+    }
+
+
     function displayProject(project) {
         const container = document.querySelector('.project-display');
         container.id = project.id;
@@ -52,7 +61,7 @@ const DOMManipulation = (() => {
         container.appendChild(description);
         container.appendChild(dropDown);
         if (project.items.length) {
-            container.appendChild(createItemElements(project));
+            container.appendChild(createItemElements(project.items));
         }
         
     }
@@ -108,8 +117,7 @@ const DOMManipulation = (() => {
         return checked;
     }
     //create a list of todo items for each project in the DOM
-    function createItemElements(project) {
-        const items = project.items;
+    function createItemElements(items) {
         const container = document.createElement('div');
         container.classList.add('items-container');
         items.forEach((item, i) => {
@@ -287,7 +295,7 @@ const DOMManipulation = (() => {
 
 
 
-    return {createProjectNameForm, addProjectToSidebar, displayProject};
+    return {createProjectNameForm, addProjectToSidebar, displayProject, createItemElements, displayToday};
 })();
 
 export default DOMManipulation;
