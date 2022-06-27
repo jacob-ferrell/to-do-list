@@ -1,5 +1,6 @@
 import Item from './item';
 import Main from './index';
+import { isToday } from 'date-fns';
 
 const DOMManipulation = (() => {
 
@@ -16,13 +17,7 @@ const DOMManipulation = (() => {
         container.appendChild(toAdd);
     }
 
-    function displayToday(todayElements) {
-        const container = document.querySelector('.project-display');
-        removeAllChildren(container);
-        container.appendChild(createItemElements(todayElements));
-        container.style.display = 'flex';
-
-    }
+    
 
 
     function displayProject(project) {
@@ -53,9 +48,10 @@ const DOMManipulation = (() => {
 
         heading.appendChild(name);
         heading.appendChild(removeBtn);
-        if (container.id == '9999') removeBtn.style.display = 'none';
+        if (['9999', '9998', '9997'].includes(container.id)) removeBtn.style.display = 'none';
         container.appendChild(heading);
         container.appendChild(addItemBtn);
+        if (['9998', '9997'].includes(container.id)) addItemBtn.style.display = 'none';
         container.appendChild(taskContainer);
          addProjectButtonClickEvents(addItemBtn, removeBtn, project);
         container.appendChild(description);
@@ -295,7 +291,7 @@ const DOMManipulation = (() => {
 
 
 
-    return {createProjectNameForm, addProjectToSidebar, displayProject, createItemElements, displayToday};
+    return {createProjectNameForm, addProjectToSidebar, displayProject, createItemElements};
 })();
 
 export default DOMManipulation;
