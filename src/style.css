@@ -3,7 +3,27 @@ html, body {
     width: 100%;
     margin: 0px;
 }
+div {
+    cursor: default;
+}
+button {
+    cursor: pointer;
+}
 body {
+    display: flex;
+    flex-direction: column;
+}
+.header {
+    display: flex;
+    align-items: center;
+    background-color: rgb(36, 36, 36);
+    color: white;
+    height: 120px;
+    font-size: 50px;
+    padding-left: 50px;
+}
+.content {
+    height: 100%;
     display: flex;
 }
 .sidebar {
@@ -11,7 +31,9 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
-    background-color: rgb(238, 238, 238);
+    background-color: rgb(82, 82, 82);
+    color: rgb(218, 218, 218);
+    border-right: 2px solid black;
 }
 .todo-item {
     display: flex;
@@ -24,14 +46,18 @@ body {
 .inbox, .today, .week {
     font-weight: bold;
     font-size: 22px;
+    cursor: pointer;
+    border-bottom: 2px solid black;
 }
 .projects-heading {
     font-weight: bold;
     font-size: 22px;
     margin-bottom: 5px;
+    cursor: default;
 }
 .projects-container > div {
     padding-left: 10px;
+    cursor: pointer;
 }
 .projects-container > div:hover {
     background-color: grey;
@@ -62,6 +88,10 @@ body {
     width: 100%;
     border: none;
     padding-left: 15px;
+    background-color: rgb(175, 175, 175);
+}
+.new-project > svg {
+    color: green;
 }
 .new-project:hover {
     background-color: rgb(204, 204, 204);
@@ -121,11 +151,25 @@ body {
     padding: 20px;
     width: 100%;
     flex-direction: column;
+    background-color: rgb(175, 175, 175);
 }
 .project-display-heading {
     display: flex;
     justify-content: space-between;
 }
 #add-item-button {
-    width: fit-content;
+    padding-right: 3px;
+    color: rgb(7, 145, 7);
+    border: none;
+    background-color: rgb(175, 175, 175);
+}
+#add-item-button svg:hover {
+    color: rgba(94, 255, 0, 0.808);
+}
+.new-task-button {
+    display: none;
+}
+.new-task-container {
+    display: flex;
+    align-items: center;
 }

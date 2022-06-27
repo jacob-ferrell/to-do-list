@@ -39,9 +39,15 @@ const DOMManipulation = (() => {
 
         let dropDown = createDropDown(project);
 
-        let addItemBtn = document.createElement('button');
-        addItemBtn.textContent = '+ Task';
+        let addItemContainer = document.createElement('div');
+        addItemContainer.classList.add('new-task-container');
+        let addItemBtn = document.querySelector('.new-task-button').cloneNode(true);
+        addItemBtn.classList.remove('new-task-button')
         addItemBtn.id = 'add-item-button';
+        let addItemLabel = document.createElement('div');
+        addItemLabel.textContent = 'Task';
+        addItemContainer.appendChild(addItemBtn);
+        addItemContainer.appendChild(addItemLabel);
 
         let removeBtn = document.createElement('button');
         removeBtn.textContent = 'Remove Project';
@@ -50,8 +56,8 @@ const DOMManipulation = (() => {
         heading.appendChild(removeBtn);
         if (['9999', '9998', '9997'].includes(container.id)) removeBtn.style.display = 'none';
         container.appendChild(heading);
-        container.appendChild(addItemBtn);
-        if (['9998', '9997'].includes(container.id)) addItemBtn.style.display = 'none';
+        container.appendChild(addItemContainer);
+        if (['9998', '9997'].includes(container.id)) addItemContainer.style.display = 'none';
         container.appendChild(taskContainer);
          addProjectButtonClickEvents(addItemBtn, removeBtn, project, sortPriority, sortDate);
         container.appendChild(dropDown);
@@ -141,7 +147,6 @@ const DOMManipulation = (() => {
             deleteBtn.classList.add('delete');
             deleteBtn.id = `delete-${item.id}`
             deleteBtn.addEventListener('click', (event)=> {
-                console.log(event.target.id)
                 let parent = document.getElementById(event.target.id).parentNode;
                 let projectId = parent.id.replace(/-\d+$/, '');
                 let project = Main.projects.filter(project => project.id == projectId)[0];
@@ -247,7 +252,6 @@ const DOMManipulation = (() => {
                     project.addItem(Item(title, description, dueDate, radio.value, project));
                 }
             });
-            console.log(project);
             taskFormContainer.style.display = 'none';
             displayProject(project);
             taskForm.reset();
