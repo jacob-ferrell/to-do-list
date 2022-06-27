@@ -22,7 +22,6 @@ const Main = (() => {
     
     todayTab.addEventListener('click', ()=> {
         today.items = removeDuplicateItems(getTodayItems());
-        console.log(today.items, getTodayItems())
         DOM.displayProject(today)
     })
 
@@ -65,7 +64,7 @@ const Main = (() => {
         let today = [];
         const todaysDate = new Date().toISOString().slice(0, 10);
         projects.forEach(project => project.items.forEach(item => {
-            if (item.dueDate == todaysDate && project.id != '9998') today.push(item);
+            if (item.dueDate == todaysDate && !['9997', '9998'].includes(project.id)) today.push(item);
         }))
         return today;
     }
@@ -73,10 +72,8 @@ const Main = (() => {
     const getWeekItems = () => {
         let week = [];
         let today = getDate(new Date().toISOString().slice(0, 10));
-        console.log(today);
         projects.forEach(project => project.items.forEach(item => {
-            if (!['9997'].includes(project.id)) {
-                console.log('poop');
+            if (!['9997', '9998'].includes(project.id)) {
                 let date = getDate(item.dueDate);
                 let nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate()+7);
                 if (date >= today && date <= nextWeek) week.push(item);
@@ -99,16 +96,20 @@ const Main = (() => {
             let newProject = Project(name, projects);
             projects.push(newProject);
             DOM.addProjectToSidebar(newProject, projects);
-            document.querySelector('.projects-heading').textContent = `Projects (${projects.length})`;
+            document.querySelector('.projects-heading').textContent = `Projects (${getNumProjects()})`;
             DOM.displayProject(newProject);
         }
     }
     const removeProject = (project) => {
         let byId = projects.map(e => e.id);
         projects.splice(byId.indexOf(project.id), 1);
-        document.querySelector('.projects-heading').textContent = `Projects (${projects.length})`;
+        document.querySelector('.projects-heading').textContent = `Projects (${getNumProjects()})`;
     }
 
-    return {removeProject, projects, inbox};
+    const getNumProjects = () => {
+        return projects.filter(project => !['9997', '9998', '9999'].includes(project.id)).length
+    }
+
+    return {removeProject, projects, inbox, getDate};
 })();
 export default Main;

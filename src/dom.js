@@ -17,9 +17,6 @@ const DOMManipulation = (() => {
         container.appendChild(toAdd);
     }
 
-    
-
-
     function displayProject(project) {
         const container = document.querySelector('.project-display');
         container.id = project.id;
@@ -34,8 +31,11 @@ const DOMManipulation = (() => {
         let taskContainer = document.createElement('div');
         taskContainer.classList.add('task-container');
 
-        let description = document.createElement('div');
-        description.textContent = project.description;
+        let sortPriority = document.createElement('button');
+        sortPriority.textContent = 'By Priority';
+
+        let sortDate = document.createElement('button');
+        sortDate.textContent = 'By Date';
 
         let dropDown = createDropDown(project);
 
@@ -53,13 +53,14 @@ const DOMManipulation = (() => {
         container.appendChild(addItemBtn);
         if (['9998', '9997'].includes(container.id)) addItemBtn.style.display = 'none';
         container.appendChild(taskContainer);
-         addProjectButtonClickEvents(addItemBtn, removeBtn, project);
-        container.appendChild(description);
+         addProjectButtonClickEvents(addItemBtn, removeBtn, project, sortPriority, sortDate);
         container.appendChild(dropDown);
+        container.appendChild(sortPriority);
+        container.appendChild(sortDate);
+
         if (project.items.length) {
             container.appendChild(createItemElements(project.items));
         }
-        
     }
 
     function createDropDown(project) {
@@ -142,6 +143,8 @@ const DOMManipulation = (() => {
             deleteBtn.addEventListener('click', (event)=> {
                 console.log(event.target.id)
                 let parent = document.getElementById(event.target.id).parentNode;
+                let projectId = parent.id.replace(/-\d+$/, '');
+                let project = Main.projects.filter(project => project.id == projectId)[0];
                 parent.remove();
                 project.removeItem(parent.id);
             })
@@ -180,9 +183,10 @@ const DOMManipulation = (() => {
     }
 
     function setEditTaskEvents(taskId) {
-        const project = selectDisplayedProject()
+        const projectId = taskId.replace(/\-\d+$/, '');
+        const project = Main.projects.filter(project => project.id == projectId)[0];
         const byId = project.items.map(e => e.id);
-        const task = selectDisplayedProject().items.filter(task => task.id == taskId)[0];
+        const task = project.items.filter(task => task.id == taskId)[0];
         const form = document.getElementById('edit-task-form')
         const newForm = form.cloneNode(true);  
         const closeForm = () => document.querySelector('.edit-task-popup').style.display = 'none';
@@ -192,9 +196,12 @@ const DOMManipulation = (() => {
             let description = document.querySelector('#edit-task-form .description').value;
             let dueDate = document.querySelector('#edit-task-form #due-date').value;
             document.querySelectorAll('#edit-task-form .priority-container input').forEach(radio => {
-                if (radio.checked) project.items[byId.indexOf(taskId)] = Item(title, description, dueDate, radio.value, selectDisplayedProject());
+                if (radio.checked) project.items[byId.indexOf(taskId)] = Item(title, description, dueDate, radio.value, project);
             });
-            displayProject(selectDisplayedProject());
+            const displayed = selectDisplayedProject();
+            if (displayed.id == '9998') document.querySelector('.today').click();
+            else if (displayed.id == '9997') document.querySelector('.week').click();
+            displayProject(displayed);
             closeForm();
         })
 
@@ -211,9 +218,7 @@ const DOMManipulation = (() => {
         })
     }
 
-
-
-    function addProjectButtonClickEvents(addItem, removeProject, project) {
+    function addProjectButtonClickEvents(addItem, removeProject, project, byPriority, byDate) {
         const taskFormContainer = document.querySelector('.new-task-popup');
         const taskForm = document.getElementById('new-task-form');
         taskForm.addEventListener('submit', submitForm);
@@ -230,6 +235,8 @@ const DOMManipulation = (() => {
             Main.removeProject(project);
             removeAllChildren(document.querySelector('.project-display'));
         });
+        byPriority.addEventListener('click', sortByPriority);
+        byDate.addEventListener('click', sortByDate);
         function submitForm(e) {
             project = selectDisplayedProject();
             let title = document.querySelector('.new-task-popup #title').value;
@@ -246,9 +253,19 @@ const DOMManipulation = (() => {
             taskForm.reset();
             taskForm.removeEventListener('submit', submitForm);
         }
-    }
 
-    
+        function sortByPriority(e) {
+            const priorities = ['low', 'medium', 'high'];
+            project.items = project.items.sort((a, b) => priorities.indexOf(b.priority) - priorities.indexOf(a.priority));
+            displayProject(project);
+        }
+
+        function sortByDate(e) {
+            project.items = project.items.sort((a, b) => Main.getDate(a.dueDate) - Main.getDate(b.dueDate));
+            displayProject(project);
+        }
+        
+    }
 
     function selectDisplayedProject() {
         const byId = Main.projects.map(e => e.id);
@@ -288,8 +305,6 @@ const DOMManipulation = (() => {
         container.appendChild(buttonContainer);
         sidebar.appendChild(container);
     }
-
-
 
     return {createProjectNameForm, addProjectToSidebar, displayProject, createItemElements};
 })();
