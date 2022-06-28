@@ -28,16 +28,24 @@ const DOMManipulation = (() => {
         name.textContent = project.name;
         name.id = 'project-name-display';
 
-        let taskContainer = document.createElement('div');
-        taskContainer.classList.add('task-container');
+        let sortContainer = document.createElement('div');
+        sortContainer.classList.add('sort-container');
+
+        let sortLabel = document.createElement('div');
+        sortLabel.textContent = 'Sort By'
+        sortContainer.appendChild(sortLabel);
 
         let sortPriority = document.createElement('button');
-        sortPriority.textContent = 'By Priority';
+        sortPriority.textContent = 'Priority';
+        sortContainer.appendChild(sortPriority);
 
         let sortDate = document.createElement('button');
-        sortDate.textContent = 'By Date';
+        sortDate.textContent = 'Due Date';
+        sortContainer.appendChild(sortDate);
 
-        let dropDown = createDropDown(project);
+
+        let taskContainer = document.createElement('div');
+        taskContainer.classList.add('task-container');
 
         let addItemContainer = document.createElement('div');
         addItemContainer.classList.add('new-task-container');
@@ -49,10 +57,12 @@ const DOMManipulation = (() => {
         addItemContainer.appendChild(addItemBtn);
         addItemContainer.appendChild(addItemLabel);
 
-        let removeBtn = document.createElement('button');
-        removeBtn.textContent = 'Remove Project';
+        let removeBtn = document.querySelector('.remove-project-button-template').cloneNode(true);
+        removeBtn.classList.remove('remove-project-button-template');
+        removeBtn.classList.add('remove-project-button');
 
         heading.appendChild(name);
+        heading.appendChild(sortContainer);
         heading.appendChild(removeBtn);
         if (['9999', '9998', '9997'].includes(container.id)) removeBtn.style.display = 'none';
         container.appendChild(heading);
@@ -60,64 +70,9 @@ const DOMManipulation = (() => {
         if (['9998', '9997'].includes(container.id)) addItemContainer.style.display = 'none';
         container.appendChild(taskContainer);
          addProjectButtonClickEvents(addItemBtn, removeBtn, project, sortPriority, sortDate);
-        container.appendChild(dropDown);
-        container.appendChild(sortPriority);
-        container.appendChild(sortDate);
-
         if (project.items.length) {
             container.appendChild(createItemElements(project.items));
         }
-    }
-
-    function createDropDown(project) {
-        const container = document.createElement('div');
-        container.classList.add('dropdown');
-
-        const btn = document.createElement('button');
-        btn.textContent = 'Mark As';
-        btn.classList.add('dropbtn');
-        let dropdown = document.querySelector('.dropdown-content')
-        btn.addEventListener('click', ()=> document.querySelector('.dropdown-content').style.display = 'flex');
-        window.onclick = function(event) {
-            if (!event.target.matches('.dropbtn') && document.querySelector('.dropdown-content')) document.querySelector('.dropdown-content').style.display = 'none';
-        }
-        container.appendChild(btn);
-
-        const content = document.createElement('div');
-        content.classList.add('dropdown-content');
-        container.appendChild(content);
-
-        const itemText = ['Complete', 'Incomplete'];
-        itemText.forEach((text, i) => {
-            let item = document.createElement('a');
-            item.id = text.toLowerCase();
-            item.addEventListener('click', (e) => {
-                getCheckedItems().forEach(check => project.items.forEach(item => {
-                    if (item.id == check.id) {
-                        if (e.target.id == 'complete') {
-                        item.complete = true;
-                        check.classList.add('complete');
-                        } else {
-                            item.complete = false;
-                            check.classList.remove('complete');
-                        }
-                    }
-                }))
-            })
-            item.textContent = text;
-            content.appendChild(item);
-        })
-        return container;
-    }
-
-    function getCheckedItems() {
-        let checked = [];
-        const boxes = document.querySelectorAll('.todo-item input');
-        boxes.forEach(box => {
-            if (box.checked) checked.push(box.parentNode);
-            box.checked = false;
-        })
-        return checked;
     }
     //create a list of todo items for each project in the DOM
     function createItemElements(items) {
@@ -131,6 +86,8 @@ const DOMManipulation = (() => {
 
             let checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
+            checkbox.addEventListener('click', markComplete);
+            if (item.complete) checkbox.checked = true;
 
             let edit = document.createElement('button');
             edit.textContent = 'Edit';
@@ -147,7 +104,7 @@ const DOMManipulation = (() => {
             deleteBtn.classList.add('delete');
             deleteBtn.id = `delete-${item.id}`
             deleteBtn.addEventListener('click', (event)=> {
-                let parent = document.getElementById(event.target.id).parentNode;
+                let parent = event.target.parentNode;
                 let projectId = parent.id.replace(/-\d+$/, '');
                 let project = Main.projects.filter(project => project.id == projectId)[0];
                 parent.remove();
@@ -168,6 +125,18 @@ const DOMManipulation = (() => {
             container.appendChild(itemElement);
         })
         return container;
+    }
+
+    function markComplete(e) {
+        let itemId = e.target.parentNode.id;
+        e.target.parentNode.classList.toggle('complete');
+        Main.projects.forEach(project => project.items.forEach(item => {
+            if (item.id == itemId) {
+                item.complete = e.target.parentNode.classList.contains('complete');
+                console.log(item);
+            }
+        }))
+
     }
 
     function setEditTaskFields(taskId) {
@@ -261,12 +230,18 @@ const DOMManipulation = (() => {
         function sortByPriority(e) {
             const priorities = ['low', 'medium', 'high'];
             project.items = project.items.sort((a, b) => priorities.indexOf(b.priority) - priorities.indexOf(a.priority));
+            byPriority.classList.add('selected-priority');
+            console.log(byPriority.classList.contains('selected-priority'));
+            byDate.classList.remove('selected-priority');
             displayProject(project);
+            
         }
 
         function sortByDate(e) {
             project.items = project.items.sort((a, b) => Main.getDate(a.dueDate) - Main.getDate(b.dueDate));
             displayProject(project);
+            byPriority.classList.remove('selected-priority');
+            byDate.classList.add('selected-priority');
         }
         
     }
