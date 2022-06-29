@@ -207,13 +207,13 @@ body {
 .priority-container input[type="radio"]:checked + label {
     border: 2px solid black;
 }
-label[for="low-button"] {
+label[for="low-button"], label[for="edit-low-button"] {
     background-color: yellow;
 }
-label[for="medium-button"] {
+label[for="medium-button"], label[for="edit-medium-button"] {
     background-color: orange;
 }
-label[for="high-button"] {
+label[for="high-button"], label[for="edit-high-button"] {
     background-color: rgba(255, 0, 0, 0.774);
 }
 .close, .close-edit {
