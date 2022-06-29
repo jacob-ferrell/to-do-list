@@ -12,7 +12,7 @@ const DOMManipulation = (() => {
         const container = document.querySelector('.projects-container');
         let toAdd = document.createElement('div');
         let projectName = document.createElement('div');
-        let taskCount = document.querySelector('.task-count-template').cloneNode(true);
+        let taskCount = document.querySelector('body > .task-count-template').cloneNode(true);
         toAdd.appendChild(projectName);
         toAdd.appendChild(taskCount);
         projectName.textContent = project.name;

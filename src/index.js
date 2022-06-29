@@ -113,6 +113,7 @@ const Main = (() => {
             let count = document.querySelector(`${selector} .task-count-number`);
             let incompleteTasks = project.items.filter(item => !item.complete)
             if (incompleteTasks.length) {
+                console.log(project, incompleteTasks)
                 container.style.display = 'flex';
                 count.textContent = incompleteTasks.length;
             } else container.style.display = 'none';

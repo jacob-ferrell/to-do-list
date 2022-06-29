@@ -78,6 +78,21 @@ body {
 }
 .task-count-template {
     display: none;
+    align-items: center;
+    font-size: 16px;
+    padding-right: 5px;
+    pointer-events: none;
+}
+.task-count-number {
+    background-color: orange;
+    border-radius: 50%;
+    height: 20px;
+    width: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: black;
+    font-weight: normal;
 }
 .task-count-template svg {
     color: orange;
