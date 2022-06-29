@@ -61,12 +61,15 @@ const Main = (() => {
     })
 
     const getTodayItems = () => {
-        let today = [];
-        const todaysDate = new Date().toISOString().slice(0, 10);
+        let todayArr = [];
+        const today = new Date();
+        const todaysDate = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${(today.getDate()).toString().padStart(2, '0')}`
+        console.log(todaysDate)
         projects.forEach(project => project.items.forEach(item => {
-            if (item.dueDate == todaysDate && !['9997', '9998'].includes(project.id)) today.push(item);
+            console.log(item.dueDate)
+            if (item.dueDate == todaysDate && !['9997', '9998'].includes(project.id)) todayArr.push(item);
         }))
-        return today;
+        return todayArr;
     }
 
     const getWeekItems = () => {

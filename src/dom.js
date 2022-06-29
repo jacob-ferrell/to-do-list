@@ -43,10 +43,6 @@ const DOMManipulation = (() => {
         sortDate.textContent = 'Due Date';
         sortContainer.appendChild(sortDate);
 
-
-        let taskContainer = document.createElement('div');
-        taskContainer.classList.add('task-container');
-
         let addItemContainer = document.createElement('div');
         addItemContainer.classList.add('new-task-container');
         let addItemBtn = document.querySelector('.new-task-button').cloneNode(true);
@@ -60,15 +56,14 @@ const DOMManipulation = (() => {
         let removeBtn = document.querySelector('.remove-project-button-template').cloneNode(true);
         removeBtn.classList.remove('remove-project-button-template');
         removeBtn.classList.add('remove-project-button');
+        sortContainer.appendChild(removeBtn);
 
         heading.appendChild(name);
         heading.appendChild(sortContainer);
-        heading.appendChild(removeBtn);
         if (['9999', '9998', '9997'].includes(container.id)) removeBtn.style.display = 'none';
         container.appendChild(heading);
         container.appendChild(addItemContainer);
         if (['9998', '9997'].includes(container.id)) addItemContainer.style.display = 'none';
-        container.appendChild(taskContainer);
          addProjectButtonClickEvents(addItemBtn, removeBtn, project, sortPriority, sortDate);
         if (project.items.length) {
             container.appendChild(createItemElements(project.items));
@@ -86,42 +81,55 @@ const DOMManipulation = (() => {
 
             let checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
+            checkbox.classList.add('checkbox');
             checkbox.addEventListener('click', markComplete);
             if (item.complete) checkbox.checked = true;
 
-            let edit = document.createElement('button');
-            edit.textContent = 'Edit';
+            let buttonsContainer = document.createElement('div');
+            buttonsContainer.classList.add('item-buttons-container');
+
+            let edit = document.querySelector('.edit-task-button').cloneNode(true);
             edit.classList.add('edit');
+            edit.classList.remove('edit-task-button');
             edit.id = `edit-${item.id}`;
             edit.addEventListener('click', (e) => {
-                let taskId = document.getElementById(e.target.id).parentNode.id;
+                let taskId = e.target.parentNode.parentNode.id;
                 setEditTaskFields(taskId);
                 setEditTaskEvents(taskId);
             })
-
-            let deleteBtn = document.createElement('button');
-            deleteBtn.textContent = 'Delete';
+        
+            let deleteBtn = document.querySelector('.delete-task-button').cloneNode(true);
             deleteBtn.classList.add('delete');
+            deleteBtn.classList.remove('delete-task-button');
             deleteBtn.id = `delete-${item.id}`
             deleteBtn.addEventListener('click', (event)=> {
-                let parent = event.target.parentNode;
+                let parent = event.target.parentNode.parentNode;
                 let projectId = parent.id.replace(/-\d+$/, '');
                 let project = Main.projects.filter(project => project.id == projectId)[0];
                 parent.remove();
                 project.removeItem(parent.id);
             })
 
+            const colors = {
+                low : 'yellow',
+                medium : 'orange',
+                high : 'red'
+            }
+            itemElement.style.borderLeft = `6px solid ${colors[item.priority]}`;
+
             itemElement.appendChild(checkbox);
-            let keys = ['title', 'dueDate', 'priority'];
-            
+            let keys = ['title', 'dueDate'];
             keys.forEach(key => {
                 let field = document.createElement('div');
+                field.classList.add(`item-${key}`);
                 field.textContent = key == 'dueDate' ? formatDate(item[key]) : item[key];
-                itemElement.appendChild(field)
+                if (key == 'dueDate') buttonsContainer.appendChild(field);
+                else itemElement.appendChild(field)
             })
-
-            itemElement.appendChild(edit);
-            itemElement.appendChild(deleteBtn);
+            buttonsContainer.appendChild(edit)
+            buttonsContainer.appendChild(deleteBtn);
+            itemElement.appendChild(buttonsContainer);
+            itemElement.appendChild(document.createElement('hr'));
             container.appendChild(itemElement);
         })
         return container;
@@ -133,7 +141,6 @@ const DOMManipulation = (() => {
         Main.projects.forEach(project => project.items.forEach(item => {
             if (item.id == itemId) {
                 item.complete = e.target.parentNode.classList.contains('complete');
-                console.log(item);
             }
         }))
 
@@ -182,6 +189,30 @@ const DOMManipulation = (() => {
         const close = document.querySelector('.close-edit');
         close.addEventListener('click', ()=> closeForm());
         
+        
+    }
+
+    function hideOnClickOutside(element) {
+        const outsideClickListener = event => {
+            const id = event.target.id
+            if (id != element.id && !event.target.closest(element.id) && id != 'new-task') {
+                console.log(event.target)
+                element.style.display = 'none';
+                removeClickListener();
+            }
+        }
+        const testParents = (el) => {
+            while (el) {
+                el = el.parentNode;
+                if (el.id == element.id) return false;
+            }
+            return true;
+
+        }
+        const removeClickListener = () => {
+            document.removeEventListener('click', outsideClickListener);
+        }
+        document.addEventListener('click', outsideClickListener);
     }
 
     function formatDate(date) {
@@ -197,8 +228,11 @@ const DOMManipulation = (() => {
         const taskForm = document.getElementById('new-task-form');
         taskForm.addEventListener('submit', submitForm);
         addItem.addEventListener('click', () => {
-            taskFormContainer.style.display = 'flex';            
+            taskFormContainer.style.display = 'flex';
+            //hideOnClickOutside(taskFormContainer);
+            
         })
+        
         let cancel = document.querySelector('.close');
         cancel.addEventListener('click', () => {
             taskFormContainer.style.display = 'none';
@@ -231,7 +265,6 @@ const DOMManipulation = (() => {
             const priorities = ['low', 'medium', 'high'];
             project.items = project.items.sort((a, b) => priorities.indexOf(b.priority) - priorities.indexOf(a.priority));
             byPriority.classList.add('selected-priority');
-            console.log(byPriority.classList.contains('selected-priority'));
             byDate.classList.remove('selected-priority');
             displayProject(project);
             
@@ -261,27 +294,10 @@ const DOMManipulation = (() => {
     function createProjectNameForm() {
         document.querySelector('.new-project').style.display = 'none';
 
-        let container = document.createElement('div');
+        let container = document.querySelector('.add-project').cloneNode(true);
+        container.classList.remove('add-project');
         container.id = 'add-project';
 
-        let input = document.createElement('input');
-        input.type = 'text';
-        input.placeholder = 'Name';
-        container.appendChild(input);
-
-        let buttonContainer = document.createElement('div');
-
-        let submitButton = document.createElement('button');
-        submitButton.textContent = 'Submit';
-        submitButton.id = 'submit';
-        buttonContainer.appendChild(submitButton);
-
-        let cancelButton = document.createElement('button');
-        cancelButton.textContent = 'Cancel';
-        cancelButton.id = 'cancel';
-        buttonContainer.appendChild(cancelButton);
-
-        container.appendChild(buttonContainer);
         sidebar.appendChild(container);
     }
 
