@@ -11,13 +11,22 @@ const DOMManipulation = (() => {
     function addProjectToSidebar(project, projects) {
         const container = document.querySelector('.projects-container');
         let toAdd = document.createElement('div');
-        toAdd.textContent = project.name;
+        let projectName = document.createElement('div');
+        let taskCount = document.querySelector('.task-count-template').cloneNode(true);
+        toAdd.appendChild(projectName);
+        toAdd.appendChild(taskCount);
+        projectName.textContent = project.name;
         toAdd.id = `sidebar-${project.id}`;
         toAdd.addEventListener('click', ()=> displayProject(project));
         container.appendChild(toAdd);
     }
 
     function displayProject(project) {
+        
+        if(project.items.length) { 
+            Main.getTaskCounts();
+            Main.sortByCompleted(project);
+        }
         const container = document.querySelector('.project-display');
         container.id = project.id;
         const heading = document.createElement('div');
@@ -108,6 +117,7 @@ const DOMManipulation = (() => {
                 let project = Main.projects.filter(project => project.id == projectId)[0];
                 parent.remove();
                 project.removeItem(parent.id);
+                displayProject(selectDisplayedProject());
             })
 
             const colors = {
@@ -143,7 +153,7 @@ const DOMManipulation = (() => {
                 item.complete = e.target.parentNode.classList.contains('complete');
             }
         }))
-
+        displayProject(selectDisplayedProject());
     }
 
     function setEditTaskFields(taskId) {
@@ -177,7 +187,7 @@ const DOMManipulation = (() => {
             let description = document.querySelector('#edit-task-form .description').value;
             let dueDate = document.querySelector('#edit-task-form #due-date').value;
             document.querySelectorAll('#edit-task-form .priority-container input').forEach(radio => {
-                if (radio.checked) project.items[byId.indexOf(taskId)] = Item(title, description, dueDate, radio.value, project);
+                if (radio.checked) project.items[byId.indexOf(taskId)] = Item(title, description, dueDate, radio.value, project, task.complete);
             });
             const displayed = selectDisplayedProject();
             if (displayed.id == '9998') document.querySelector('.today').click();

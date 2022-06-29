@@ -10,28 +10,22 @@ const Main = (() => {
 
     const inbox = Project('Inbox', [], true);
     projects.push(inbox);
-    DOM.displayProject(inbox);
-    document.querySelector('.inbox').addEventListener('click', ()=> {
-        DOM.displayProject(inbox);
-    })
 
     const today = Project('Today', [], false, true);
     const todayTab = document.querySelector('.today');
     projects.push(today);
 
-    
-    todayTab.addEventListener('click', ()=> {
-        today.items = removeDuplicateItems(getTodayItems());
-        DOM.displayProject(today)
-    })
-
     const week = Project('This Week', [], false, false, true);
     const weekTab = document.querySelector('.week');
     projects.push(week);
-    weekTab.addEventListener('click', ()=> {
-        week.items = removeDuplicateItems(getWeekItems());
-        DOM.displayProject(week);
-    })
+
+    DOM.displayProject(inbox);
+    document.querySelectorAll('.inbox, .today, .week').forEach(tab => tab.addEventListener('click', ()=> {
+        const pairs = {'inbox':inbox, 'today':today, 'week':week}
+        DOM.displayProject(pairs[tab.className]);
+    }))
+
+    
     function removeDuplicateItems(items) {
         const uniqueIds = [];
         return items.filter(item => {
@@ -62,27 +56,31 @@ const Main = (() => {
 
     const getTodayItems = () => {
         let todayArr = [];
-        const today = new Date();
-        const todaysDate = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${(today.getDate()).toString().padStart(2, '0')}`
-        console.log(todaysDate)
+        const cur = new Date();
+        const todaysDate = `${cur.getFullYear()}-${(cur.getMonth() + 1).toString().padStart(2, '0')}-${(cur.getDate()).toString().padStart(2, '0')}`
         projects.forEach(project => project.items.forEach(item => {
-            console.log(item.dueDate)
             if (item.dueDate == todaysDate && !['9997', '9998'].includes(project.id)) todayArr.push(item);
         }))
-        return todayArr;
+        today.items = todayArr;
     }
 
     const getWeekItems = () => {
-        let week = [];
-        let today = getDate(new Date().toISOString().slice(0, 10));
+        let weekArr = [];
+        const cur = new Date();
+        const todaysDate = `${cur.getFullYear()}-${(cur.getMonth() + 1).toString().padStart(2, '0')}-${(cur.getDate()).toString().padStart(2, '0')}`
+        let today = getDate(todaysDate);
         projects.forEach(project => project.items.forEach(item => {
             if (!['9997', '9998'].includes(project.id)) {
                 let date = getDate(item.dueDate);
                 let nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate()+7);
-                if (date >= today && date <= nextWeek) week.push(item);
+                if (date >= today && date <= nextWeek) weekArr.push(item);
             }
         }))
-        return week;
+        week.items = weekArr;
+    }
+
+    const sortByCompleted = (project) => {
+        project.items = project.items.sort((a, b) => Number(a.complete) - Number(b.complete))
     }
 
     const getDate = (str) => {
@@ -91,6 +89,34 @@ const Main = (() => {
         let month = parseInt(arr[1], 10) - 1;
         let day = arr[2];
         return new Date(year, month, day);
+    }
+
+    const getTaskCounts = () => {
+        getTodayItems();
+        getWeekItems();
+        const pairs = {'inbox':inbox, 'today':today, 'week':week}
+        const byId = projects.map(project => project.id);
+
+        document.querySelectorAll('.inbox, .today, .week, .projects-container > div').forEach((tab, i) => {
+            let project;
+            let tabId;
+            let selector;
+            if (tab.id) {
+                selector = `#${tab.id}`
+                tabId = tab.id.replace('sidebar-', '');
+                project = projects[byId.indexOf(tabId)];
+            } else {
+                selector = `.${tab.className}`
+                project = pairs[tab.className]
+            }
+            let container = document.querySelector(`${selector} .task-count-template`);
+            let count = document.querySelector(`${selector} .task-count-number`);
+            let incompleteTasks = project.items.filter(item => !item.complete)
+            if (incompleteTasks.length) {
+                container.style.display = 'flex';
+                count.textContent = incompleteTasks.length;
+            } else container.style.display = 'none';
+        })
     }
 
     const addProject = () => {
@@ -113,6 +139,12 @@ const Main = (() => {
         return projects.filter(project => !['9997', '9998', '9999'].includes(project.id)).length
     }
 
-    return {removeProject, projects, inbox, getDate};
+    const getAllItems = () => {
+        let tasks = [];
+        projects.forEach(project => project.items.forEach(item => tasks.push(item)));
+        return tasks;
+    }
+
+    return {removeProject, projects, inbox, getDate, sortByCompleted, getTaskCounts, getTodayItems, getAllItems};
 })();
 export default Main;

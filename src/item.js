@@ -1,6 +1,5 @@
 //factory function for creating objects for todo items
-const Task = (title, description, dueDate, priority, project) => {
-    let complete = false;
+const Task = (title, description, dueDate, priority, project, complete = false) => {
 
     const getUniqueId = () => {
        let otherIds = project.items.map(e => Number(e.id.match(/\d{3}$/)));

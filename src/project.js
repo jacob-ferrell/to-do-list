@@ -5,11 +5,12 @@ const Project = (name, projects, isInbox = false, isToday = false, isWeek = fals
     const addItem = (item) => items.push(item);
 
     const getUniqueId = () => {
-        let otherIds = projects.map(e => Number(e.id.match(/\d{3}$/)[0]));
+        let otherIds = projects.filter(project => !['9999', '9998', '9997'].includes(project.id)).map(e => Number(e.id.match(/\d{3}$/)[0]));
         if (!otherIds.length) {
          return `000`;
         } else {
          let largest = Math.max(...otherIds);
+         if (largest === 9996) largest = 9999;
          return (largest + 1).toString().padStart(3, '0');
         }
     }
