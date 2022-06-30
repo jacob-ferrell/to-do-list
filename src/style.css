@@ -76,6 +76,9 @@ body {
     display: flex;
     justify-content: space-between;
 }
+.inbox:hover, .today:hover, .week:hover {
+    background-color: grey;
+}
 .task-count-template {
     display: none;
     align-items: center;

@@ -2,22 +2,29 @@ import './style.css';
 import Item from './item';
 import DOM from './dom';
 import Project from './project.js';
-import { compareAsc, format } from 'date-fns';
 
 
 const Main = (() => {
-    const projects = [];
-
-    const inbox = Project('Inbox', [], true);
+    const projects = JSON.parse(window.localStorage.getItem('projects')) || [];
+    let inbox;
+    let today;
+    let week; 
+    if (projects.length) {
+        inbox = getProjectById('9999');
+        today = getProjectById('9998');
+        week = getProjectById('9997');
+    } else {
+    inbox = Project('Inbox', [], true);
     projects.push(inbox);
 
-    const today = Project('Today', [], false, true);
+    today = Project('Today', [], false, true);
     const todayTab = document.querySelector('.today');
     projects.push(today);
 
-    const week = Project('This Week', [], false, false, true);
+    week = Project('This Week', [], false, false, true);
     const weekTab = document.querySelector('.week');
     projects.push(week);
+    }
 
     DOM.displayProject(inbox);
     document.querySelectorAll('.inbox, .today, .week').forEach(tab => tab.addEventListener('click', ()=> {
@@ -37,6 +44,10 @@ const Main = (() => {
             return false;
         });
        
+    }
+
+    function getProjectById(id) {
+        return projects.filter(project => project.id == id)[0];
     }
     const newProjectButton = document.querySelector('.new-project');
     newProjectButton.addEventListener('click', ()=> {
@@ -113,7 +124,6 @@ const Main = (() => {
             let count = document.querySelector(`${selector} .task-count-number`);
             let incompleteTasks = project.items.filter(item => !item.complete)
             if (incompleteTasks.length) {
-                console.log(project, incompleteTasks)
                 container.style.display = 'flex';
                 count.textContent = incompleteTasks.length;
             } else container.style.display = 'none';

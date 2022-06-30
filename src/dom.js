@@ -22,11 +22,13 @@ const DOMManipulation = (() => {
     }
 
     function displayProject(project) {
-        
         if(project.items.length) { 
             Main.getTaskCounts();
             Main.sortByCompleted(project);
         }
+        //if (Main.projects) window.localStorage.setItem('projects', Main.projects);
+        //window.localStorage['projectElement'] = JSON.stringify(document.querySelector('.project-display').innerHTML);
+        //window.localStorage['projects'] = JSON.stringify(Main.projects);
         const container = document.querySelector('.project-display');
         container.id = project.id;
         const heading = document.createElement('div');
@@ -263,6 +265,7 @@ const DOMManipulation = (() => {
             document.querySelectorAll('.new-task-popup .priority-container input').forEach(radio => {
                 if (radio.checked && title && dueDate) {
                     project.addItem(Item(title, description, dueDate, radio.value, project));
+                    window.localStorage.setItem('projects', JSON.stringify(Main.projects));
                 }
             });
             taskFormContainer.style.display = 'none';
