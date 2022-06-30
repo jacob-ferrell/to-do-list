@@ -21,14 +21,11 @@ const DOMManipulation = (() => {
         container.appendChild(toAdd);
     }
 
-    function displayProject(project) {
-        if(project.items.length) { 
+    function displayProject(project, isLoad = false) {
+        if(project.items.length && !isLoad) { 
             Main.getTaskCounts();
             Main.sortByCompleted(project);
         }
-        //if (Main.projects) window.localStorage.setItem('projects', Main.projects);
-        //window.localStorage['projectElement'] = JSON.stringify(document.querySelector('.project-display').innerHTML);
-        //window.localStorage['projects'] = JSON.stringify(Main.projects);
         const container = document.querySelector('.project-display');
         container.id = project.id;
         const heading = document.createElement('div');
@@ -79,6 +76,8 @@ const DOMManipulation = (() => {
         if (project.items.length) {
             container.appendChild(createItemElements(project.items));
         }
+        window.localStorage['projectElement'] = JSON.stringify(container.innerHTML);
+
     }
     //create a list of todo items for each project in the DOM
     function createItemElements(items) {
@@ -118,7 +117,7 @@ const DOMManipulation = (() => {
                 let projectId = parent.id.replace(/-\d+$/, '');
                 let project = Main.projects.filter(project => project.id == projectId)[0];
                 parent.remove();
-                project.removeItem(parent.id);
+                Main.removeItem(parent.id, project);
                 displayProject(selectDisplayedProject());
             })
 
@@ -155,6 +154,7 @@ const DOMManipulation = (() => {
                 item.complete = e.target.parentNode.classList.contains('complete');
             }
         }))
+        window.localStorage['projects'] = JSON.stringify(Main.projects);
         displayProject(selectDisplayedProject());
     }
 
@@ -259,13 +259,15 @@ const DOMManipulation = (() => {
         byDate.addEventListener('click', sortByDate);
         function submitForm(e) {
             project = selectDisplayedProject();
+            
             let title = document.querySelector('.new-task-popup #title').value;
             let description = document.querySelector('.new-task-popup .description').value;
             let dueDate = document.querySelector('.new-task-popup #due-date').value;
             document.querySelectorAll('.new-task-popup .priority-container input').forEach(radio => {
                 if (radio.checked && title && dueDate) {
-                    project.addItem(Item(title, description, dueDate, radio.value, project));
-                    window.localStorage.setItem('projects', JSON.stringify(Main.projects));
+                    console.log(project);
+                    project.items.push(Item(title, description, dueDate, radio.value, project));
+                    window.localStorage['projects'] = JSON.stringify(Main.projects);
                 }
             });
             taskFormContainer.style.display = 'none';
@@ -311,7 +313,7 @@ const DOMManipulation = (() => {
         container.classList.remove('add-project');
         container.id = 'add-project';
 
-        sidebar.appendChild(container);
+        document.querySelector('.sidebar').appendChild(container);
     }
 
     return {createProjectNameForm, addProjectToSidebar, displayProject, createItemElements};

@@ -9,24 +9,9 @@ const Main = (() => {
     let inbox;
     let today;
     let week; 
-    if (projects.length) {
-        inbox = getProjectById('9999');
-        today = getProjectById('9998');
-        week = getProjectById('9997');
-    } else {
-    inbox = Project('Inbox', [], true);
-    projects.push(inbox);
+    
 
-    today = Project('Today', [], false, true);
-    const todayTab = document.querySelector('.today');
-    projects.push(today);
-
-    week = Project('This Week', [], false, false, true);
-    const weekTab = document.querySelector('.week');
-    projects.push(week);
-    }
-
-    DOM.displayProject(inbox);
+    //DOM.displayProject(inbox);
     document.querySelectorAll('.inbox, .today, .week').forEach(tab => tab.addEventListener('click', ()=> {
         const pairs = {'inbox':inbox, 'today':today, 'week':week}
         DOM.displayProject(pairs[tab.className]);
@@ -137,25 +122,47 @@ const Main = (() => {
             projects.push(newProject);
             DOM.addProjectToSidebar(newProject, projects);
             document.querySelector('.projects-heading').textContent = `Projects (${getNumProjects()})`;
+            window.localStorage['projects'] = JSON.stringify(Main.projects);
             DOM.displayProject(newProject);
         }
     }
     const removeProject = (project) => {
         let byId = projects.map(e => e.id);
         projects.splice(byId.indexOf(project.id), 1);
+        window.localStorage['projects'] = JSON.stringify(Main.projects);
         document.querySelector('.projects-heading').textContent = `Projects (${getNumProjects()})`;
     }
-
+    const removeItem = (itemId, project) => {
+        let byId = project.items.map(e => e.id);
+        project.items.splice(byId.indexOf(itemId), 1);
+        window.localStorage.setItem('projects', JSON.stringify(Main.projects));
+    }
     const getNumProjects = () => {
         return projects.filter(project => !['9997', '9998', '9999'].includes(project.id)).length
     }
 
-    const getAllItems = () => {
-        let tasks = [];
-        projects.forEach(project => project.items.forEach(item => tasks.push(item)));
-        return tasks;
-    }
+    if (projects.length) {
+        inbox = getProjectById('9999');
+        today = getProjectById('9998');
+        week = getProjectById('9997');
+        if (projects.length > 3) {
+            projects.filter(e => !['9999', '9998', '9997'].includes(e.id)).forEach(project => {
+                DOM.addProjectToSidebar(project, projects);
+            })
+        }
+    } else {
+    inbox = Project('Inbox', [], true);
+    projects.push(inbox);
 
-    return {removeProject, projects, inbox, getDate, sortByCompleted, getTaskCounts, getTodayItems, getAllItems};
+    today = Project('Today', [], false, true);
+    projects.push(today);
+
+    week = Project('This Week', [], false, false, true);
+    projects.push(week);
+    }
+    getTaskCounts();
+    DOM.displayProject(inbox, true);
+    
+    return {removeProject, projects, inbox, getDate, sortByCompleted, getTaskCounts, removeItem};
 })();
 export default Main;
