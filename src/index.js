@@ -2,54 +2,22 @@ import './style.css';
 import Item from './item';
 import DOM from './dom';
 import Project from './project.js';
+import Events from './events';
 
 
 const Main = (() => {
+    //declare global variables
     const projects = JSON.parse(window.localStorage.getItem('projects')) || [];
     let inbox;
     let today;
-    let week; 
+    let week;
     
-
-    //DOM.displayProject(inbox);
-    document.querySelectorAll('.inbox, .today, .week').forEach(tab => tab.addEventListener('click', ()=> {
-        const pairs = {'inbox':inbox, 'today':today, 'week':week}
-        DOM.displayProject(pairs[tab.className]);
-    }))
-
     
-    function removeDuplicateItems(items) {
-        const uniqueIds = [];
-        return items.filter(item => {
-            const isDuplicate = uniqueIds.includes(item.id);
-            if (!isDuplicate) {
-                uniqueIds.push(item.id);
-                return true;
-            }
-            return false;
-        });
-       
-    }
-
+    //select a project by the provided ID
     function getProjectById(id) {
         return projects.filter(project => project.id == id)[0];
     }
-    const newProjectButton = document.querySelector('.new-project');
-    newProjectButton.addEventListener('click', ()=> {
-        DOM.createProjectNameForm();
-        let submit = document.getElementById('submit');
-        let cancel = document.getElementById('cancel');
-        submit.addEventListener('click', ()=> {
-            addProject();
-            document.getElementById('add-project').remove();
-            newProjectButton.style.display = 'flex';
-        })
-        cancel.addEventListener('click', () => {
-            document.getElementById('add-project').remove();
-            newProjectButton.style.display = 'flex';
-        })
-    })
-
+    //get all items which are due 'today' and add them to the today project
     const getTodayItems = () => {
         let todayArr = [];
         const cur = new Date();
@@ -59,7 +27,7 @@ const Main = (() => {
         }))
         today.items = todayArr;
     }
-
+    //get all items which are due within the next 7 days and add them to the week project
     const getWeekItems = () => {
         let weekArr = [];
         const cur = new Date();
@@ -74,11 +42,11 @@ const Main = (() => {
         }))
         week.items = weekArr;
     }
-
+    //sort the items of a given project by whether or not the task is completed, with incomplete tasks coming first
     const sortByCompleted = (project) => {
         project.items = project.items.sort((a, b) => Number(a.complete) - Number(b.complete))
     }
-
+    //take a date string in the format 'yyyy-mm-dd' and return a date object of the same date
     const getDate = (str) => {
         let arr = str.split('-');
         let year = arr[0];
@@ -86,7 +54,7 @@ const Main = (() => {
         let day = arr[2];
         return new Date(year, month, day);
     }
-
+    //get the number of tasks every project has and display that number in its tab
     const getTaskCounts = () => {
         getTodayItems();
         getWeekItems();
@@ -114,7 +82,7 @@ const Main = (() => {
             } else container.style.display = 'none';
         })
     }
-
+     //create a new project object, display that project, and create a tab for that project in the sidebar based on a given name
     const addProject = () => {
         let name = document.querySelector('#add-project input').value;
         if (name) {
@@ -126,43 +94,56 @@ const Main = (() => {
             DOM.displayProject(newProject);
         }
     }
+    //remove a project from the global variable projects
     const removeProject = (project) => {
         let byId = projects.map(e => e.id);
         projects.splice(byId.indexOf(project.id), 1);
         window.localStorage['projects'] = JSON.stringify(Main.projects);
         document.querySelector('.projects-heading').textContent = `Projects (${getNumProjects()})`;
     }
+    //remove an item from a given project based on its id
     const removeItem = (itemId, project) => {
         let byId = project.items.map(e => e.id);
         project.items.splice(byId.indexOf(itemId), 1);
         window.localStorage.setItem('projects', JSON.stringify(Main.projects));
     }
+    //get the total number of user created projects (not inbox, today, or week)
     const getNumProjects = () => {
         return projects.filter(project => !['9997', '9998', '9999'].includes(project.id)).length
     }
-
-    if (projects.length) {
-        inbox = getProjectById('9999');
-        today = getProjectById('9998');
-        week = getProjectById('9997');
-        if (projects.length > 3) {
-            projects.filter(e => !['9999', '9998', '9997'].includes(e.id)).forEach(project => {
-                DOM.addProjectToSidebar(project, projects);
-            })
-        }
-    } else {
-    inbox = Project('Inbox', [], true);
-    projects.push(inbox);
-
-    today = Project('Today', [], false, true);
-    projects.push(today);
-
-    week = Project('This Week', [], false, false, true);
-    projects.push(week);
-    }
-    getTaskCounts();
-    DOM.displayProject(inbox, true);
+    //initial method to be run when the page is opened/reloaded
+    const initialize = (() => {
+        //if save data already exists, set global variables to already existing data
+        if (projects.length) {
+            inbox = getProjectById('9999');
+            today = getProjectById('9998');
+            week = getProjectById('9997');
+            //if there are user created projects in save data, add a tab for each one to the sidebar
+            if (projects.length > 3) {
+                projects.filter(e => !['9999', '9998', '9997'].includes(e.id)).forEach(project => {
+                    DOM.addProjectToSidebar(project, projects);
+                })
+            }
+        //if there is no save data, create default projects and add them to the projects global variable    
+        } else {
+        inbox = Project('Inbox', [], true);
+        projects.push(inbox);
     
-    return {removeProject, projects, inbox, getDate, sortByCompleted, getTaskCounts, removeItem};
+        today = Project('Today', [], false, true);
+        projects.push(today);
+    
+        week = Project('This Week', [], false, false, true);
+        projects.push(week);
+        }
+        //get task counts, display default project (inbox), and add event listeners to everything on the page
+        getTaskCounts();
+        DOM.displayProject(inbox, true);
+        Events.addTabEvents(inbox, today, week);
+        Events.addNewProjectButtonEvents();
+    })();
+    
+
+    
+    return {removeProject, projects, inbox, getDate, sortByCompleted, getTaskCounts, removeItem, addProject};
 })();
 export default Main;
