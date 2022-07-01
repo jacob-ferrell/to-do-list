@@ -77,7 +77,7 @@ const DOMManipulation = (() => {
             container.appendChild(createItemElements(project.items));
         }
     }
-    //dynamically create an element for all items in a project to be displayed
+    //dynamically create an element for all items in a project for displayal
     function createItemElements(items) {
         const container = document.createElement('div');
         container.classList.add('items-container');
