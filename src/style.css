@@ -149,11 +149,14 @@ body {
     width: 100%;
     border: none;
     padding-left: 20px;
+    color:rgb(218, 218, 218);
     background-color: rgb(82, 82, 82);
+    font-weight: bold;
 }
 .new-project > svg {
     color: green;
 }
+
 .new-project:hover {
     background-color: rgb(122, 122, 122);
 }
@@ -358,8 +361,6 @@ button svg, .checkbox svg {
 #submit {
     color:rgb(7, 145, 7);
 }
-#submit:hover {
-}
 #cancel {
     color:rgb(190, 1, 1);
     border: none;
@@ -380,5 +381,8 @@ input[type="checkbox"], #submit-form {
     align-items: center;
 }
 .checked, .unchecked {
+    display: none;
+}
+.projects-container svg, .inbox svg {
     display: none;
 }
