@@ -87,10 +87,11 @@ const DOMManipulation = (() => {
             if (item['complete']) itemElement.classList.add('complete');
             itemElement.id = item.id;
 
-            let checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
+            let checkbox;
+            if (item.complete) checkbox = document.querySelector('.checked').cloneNode(true);
+            else checkbox = document.querySelector('.unchecked').cloneNode(true);
             checkbox.classList.add('checkbox');
-            if (item.complete) checkbox.checked = true;
+            checkbox.style.display = 'block';
 
             let buttonsContainer = document.createElement('div');
             buttonsContainer.classList.add('item-buttons-container');

@@ -70,7 +70,8 @@ body {
 }
 .checkbox {
     position: absolute;
-    left: -27px;
+    left: -25px;
+    cursor: pointer;
 }
 .complete {
     opacity: 30%;
@@ -320,7 +321,7 @@ label[for="high-button"], label[for="edit-high-button"] {
     display: flex;
     border: none;
 }
-button svg {
+button svg, .checkbox svg {
     pointer-events: none;
 }
 
@@ -377,4 +378,7 @@ input[type="checkbox"], #submit-form {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+.checked, .unchecked {
+    display: none;
 }
