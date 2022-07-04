@@ -6,7 +6,7 @@ import Events from './events';
 
 
 const Main = (() => {
-    //declare global variables
+    //declare global variables and load save data if it exists
     const projects = JSON.parse(window.localStorage.getItem('projects')) || [];
     let inbox;
     let today;
