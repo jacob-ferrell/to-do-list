@@ -18,7 +18,7 @@ const Events = (() => {
         removeProject.addEventListener('click', ()=> {
             document.getElementById(`sidebar-${project.id}`).remove();
             Main.removeProject(project);
-            removeAllChildren(document.querySelector('.project-display'));
+            DOM.removeAllChildren(document.querySelector('.project-display'));
         });
         byPriority.addEventListener('click', sortByPriority);
         byDate.addEventListener('click', sortByDate);

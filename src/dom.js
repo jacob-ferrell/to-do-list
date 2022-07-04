@@ -204,7 +204,7 @@ const DOMManipulation = (() => {
         document.querySelector('.sidebar').appendChild(container);
     }
 
-    return {createProjectNameForm, addProjectToSidebar, displayProject, selectDisplayedProject, setEditTaskFields};
+    return {createProjectNameForm, addProjectToSidebar, displayProject, selectDisplayedProject, setEditTaskFields, removeAllChildren};
 })();
 
 export default DOMManipulation;
